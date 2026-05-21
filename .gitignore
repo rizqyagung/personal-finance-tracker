@@ -1,0 +1,11 @@
+# Mengabaikan file konfigurasi database lokal yang berisi password sensitif
+config/database.php
+
+# Mengabaikan folder vendor jika nanti pakai library tambahan
+/vendor/
+
+# Mengabaikan file sampah OS (Ubuntu/Linux & Windows)
+.DS_Store
+.directory
+.Trash-*
+Thumds.db
