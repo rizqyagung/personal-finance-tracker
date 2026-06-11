@@ -21,24 +21,6 @@ foreach ($transactions as $tr) {
     }
 }
 $total_balance = $total_income - $total_expense;
-
-// Query untuk mengambil total pengeluaran per kategori
-$query_chart = "SELECT categories.name as category_name, SUM(transactions.amount) as total 
-                FROM transactions 
-                JOIN categories ON transactions.category_id = categories.id 
-                WHERE LOWER(categories.type) = 'expense'
-                GROUP BY categories.id";
-$stmt_chart = $pdo->query($query_chart);
-$chart_data = $stmt_chart->fetchAll();
-
-// Siapkan array kosong untuk menampung data yang akan dibaca oleh JavaScript
-$chart_labels = [];
-$chart_totals = [];
-
-foreach ($chart_data as $data) {
-    $chart_labels[] = $data['category_name'];
-    $chart_totals[] = $data['total'];
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -47,7 +29,6 @@ foreach ($chart_data as $data) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance Tracker | My Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
 
@@ -87,10 +68,7 @@ foreach ($chart_data as $data) {
     <div class="lg:col-span-2 bg-white rounded-xl shadow-md overflow-hidden h-fit">
         </div>
 
-    <div class="bg-white rounded-xl shadow-md p-6 h-fit">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Analisis Pengeluaran</h2>
-        <canvas id="expenseChart" width="100" height="100"></canvas>
-    </div>
+    
 
 </div>
                 <!-- PERBAIKAN: Tambah onclick di bawah ini -->
@@ -153,16 +131,24 @@ foreach ($chart_data as $data) {
                     <input type="date" name="date" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-                    <select name="category_id" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                        <?php
-                        $stmt_cat = $pdo->query("SELECT * FROM categories ORDER BY name ASC");
-                        while($cat = $stmt_cat->fetch()) {
-                            // KODE BARU (Lebih aman dari perbedaan huruf besar/kecil)
-echo "<option value='{$cat['id']}'>{$cat['name']} (" . (strtolower($cat['type']) == 'income' ? 'Masuk' : 'Keluar') . ")</option>";
-                        }
-                        ?>
-                    </select>
+                    <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+    <input type="text" name="category_name" placeholder="Contoh: Hadiah, Kas, Sembako" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+</div>
+
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Transaksi</label>
+    <div class="flex gap-4">
+        <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+            <input type="radio" name="category_type" value="income" checked class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 mr-2">
+            Pemasukan (Masuk)
+        </label>
+        <label class="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+            <input type="radio" name="category_type" value="expense" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 mr-2">
+            Pengeluaran (Keluar)
+        </label>
+    </div>
+</div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
@@ -189,32 +175,6 @@ echo "<option value='{$cat['id']}'>{$cat['name']} (" . (strtolower($cat['type'])
             const modal = document.getElementById('transactionModal');
             if (event.target == modal) toggleModal();
         }
-        // Ambil data dari PHP menggunakan json_encode
-const chartLabels = <?= json_encode($chart_labels); ?>;
-const chartTotals = <?= json_encode($chart_totals); ?>;
-
-const ctx = document.getElementById('expenseChart').getContext('2d');
-const expenseChart = new Chart(ctx, {
-    type: 'doughnut', // Model donat (variasi dari pie chart) yang modern
-    data: {
-        labels: chartLabels,
-        datasets: [{
-            data: chartTotals,
-            backgroundColor: [
-                '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'bottom',
-            }
-        }
-    }
-});
     </script>
 </body>
 </html>
