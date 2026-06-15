@@ -72,9 +72,22 @@ $total_balance = $total_income - $total_expense;
 
 </div>
                 <!-- PERBAIKAN: Tambah onclick di bawah ini -->
-                <button onclick="toggleModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    + Tambah Transaksi
-                </button>
+                <div class="flex flex-wrap gap-2">
+    <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1">
+        <span>+</span> Tambah
+    </button>
+
+    <a href="proses_export.php" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1">
+        📄 Export CSV
+    </a>
+
+    <form action="proses_reset.php" method="POST" onsubmit="return confirm('⚠️ PERINGATAN: Apakah kamu yakin ingin MENGHAPUS SEMUA DATA transaksi? Pastikan sudah di-export ke CSV terlebih dahulu!');" class="inline">
+        <input type="hidden" name="konfirmasi_reset" value="1">
+        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            🗑️ Kosongkan Data
+        </button>
+    </form>
+</div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -167,14 +180,31 @@ $total_balance = $total_income - $total_expense;
     </div>
 
     <script>
-        function toggleModal() {
-            const modal = document.getElementById('transactionModal');
-            modal.classList.toggle('hidden');
+    // Fungsi untuk membuka modal (Membuang class hidden)
+    function openModal() {
+        const modal = document.getElementById('transactionModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        } else {
+            console.error("Elemen dengan ID transactionModal tidak ditemukan!");
         }
-        window.onclick = function(event) {
-            const modal = document.getElementById('transactionModal');
-            if (event.target == modal) toggleModal();
+    }
+
+    // Fungsi untuk menutup modal (Menambahkan kembali class hidden)
+    function closeModal() {
+        const modal = document.getElementById('transactionModal');
+        if (modal) {
+            modal.classList.add('hidden');
         }
-    </script>
+    }
+
+    // Opsional: Menutup modal jika user klik di luar area kotak modal
+    window.onclick = function(event) {
+        const modal = document.getElementById('transactionModal');
+        if (event.target == modal) {
+            modal.classList.add('hidden');
+        }
+    }
+</script>
 </body>
 </html>
